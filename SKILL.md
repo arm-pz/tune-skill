@@ -1,6 +1,6 @@
 ---
 name: tune-skill
-description: Audit and fine-tune an existing agent skill so it triggers when it should and hands off cleanly to its siblings. Reads the real SKILL.md and references, checks the description, overlaps with sibling skills, stale names and counts, handoff contracts and command routing, makes minimal evidenced edits, validates them with a script, and writes near-miss test cases. Use whenever the user wants to fine tune, improve, tighten, debug or review a skill, says a skill is not triggering or fires on the wrong requests, wants two skills to work together or split cleanly, or pastes a SKILL.md or repo link and asks what is wrong with it, even if they never say "audit". Not for creating a skill from scratch (use skill-creator) or from a list of prompts (use prompts-to-skill).
+description: Audit and fine-tune an existing agent skill so it triggers when it should and hands off cleanly to its siblings. Reads the real SKILL.md and references, checks the description, overlaps with sibling skills, stale names and counts, handoff contracts and command routing, makes minimal evidenced edits, validates them with a script, and writes near-miss test cases. Use whenever the user wants to fine tune, improve, tighten, debug or review a skill, says a skill is not triggering or fires on the wrong requests, wants two skills to work together or split cleanly, or pastes a SKILL.md or repo link and asks what is wrong with it, even if they never say "audit". Not for creating a skill from scratch (use draft-skill) or from a list of prompts (use prompts-to-skill).
 ---
 
 # Tune skill
@@ -48,7 +48,7 @@ It checks that the name matches the folder, the description fits the 1024-charac
 
 ### 7. Write test cases
 
-Follow `references/test-cases.md`. Every boundary you changed gets one case on each side. Run them by hand against the descriptions, or with skill-creator's loop when Claude Code is available, and say which you did.
+Follow `references/test-cases.md`. Every boundary you changed gets one case on each side. Run them by hand against the descriptions. Some agents ship an automated triggering loop in their authoring tooling; if you didn't run one, don't imply you did. Say which you did.
 
 ### 8. Report
 

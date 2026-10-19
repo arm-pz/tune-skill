@@ -34,6 +34,6 @@ The pass condition is something you can check: "does not rewrite any bullet", "e
 ## Running them
 
 - **By hand:** read only the descriptions and decide, for each message, which skill an agent would pick. Mark each case pass or fail. This is quick and catches most overlaps.
-- **With tooling:** when Claude Code is available, skill-creator's description-improvement loop runs the cases against real triggering. The automated loop doesn't run in a plain chat, so don't claim it did.
+- **With tooling:** some agents ship a description-improvement loop that runs cases against real triggering. It does not run in a plain chat, so don't claim it did — record it as not run.
 
 Record the results in the report: how many cases, how many were run, which failed, and what you changed because of them.

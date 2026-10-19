@@ -65,7 +65,8 @@ tune-skill/
 ## Boundaries
 
 - **Handles:** a skill that exists and needs tightening, debugging or reviewing.
-- **Does not handle:** creating a skill from scratch (`skill-creator`), or from a list of prompts
+- **Does not handle:** creating a skill from scratch ([`draft-skill`](https://github.com/arm-pz/draft-skill)),
+  or from a list of prompts
   ([`prompts-to-skill`](https://github.com/arm-pz/prompts-to-skill)).
 - **Related:** [`prompts-to-skill-release`](https://github.com/arm-pz/prompts-to-skill-release) releases
   what this skill tunes, and checks its gate against this skill's validator.
