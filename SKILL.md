@@ -1,0 +1,62 @@
+---
+name: tune-skill
+description: Audit and fine-tune an existing agent skill so it triggers when it should and hands off cleanly to its siblings. Reads the real SKILL.md and references, checks the description, overlaps with sibling skills, stale names and counts, handoff contracts and command routing, makes minimal evidenced edits, validates them with a script, and writes near-miss test cases. Use whenever the user wants to fine tune, improve, tighten, debug or review a skill, says a skill is not triggering or fires on the wrong requests, wants two skills to work together or split cleanly, or pastes a SKILL.md or repo link and asks what is wrong with it, even if they never say "audit". Not for creating a skill from scratch (use skill-creator) or from a list of prompts (use prompts-to-skill).
+---
+
+# Tune skill
+
+Fine-tuning is a set of small, evidenced edits to a skill that already exists. It is not a rewrite. The goal is a skill that triggers on the right requests, stays out of its siblings' way, and passes work along in a defined shape.
+
+## Ground rules
+
+- **Read the real SKILL.md first.** READMEs, repo descriptions and listings drift from the file the agent actually loads. Any claim about a skill must come from its SKILL.md or its references. If you can't open a file, name it and say what you are inferring instead.
+- **Check your own claims.** If a file you read later contradicts something you said earlier, say so plainly and correct it. Don't quietly route around it.
+- **Minimal edits, the author's voice.** Change what the audit found and nothing else. Keep frontmatter keys you don't recognise (`version`, `argument-hint`, `user-invocable`). Never weaken honesty, safety or privacy rules.
+- **Don't claim what you didn't run.** Say which checks ran, which test cases were only written, and which files you never saw.
+
+## Workflow
+
+### 1. Collect
+
+Get the SKILL.md of the target skill and of every sibling it touches, plus any references you can reach. If the user gives a link you can't open, ask for the file text or its URL. If the skill is a folder on disk, run the check script (step 6) now for a first read.
+
+### 2. Map
+
+Write a short inventory per skill: what its description promises, its modes or commands, the reference files it names, and what it hands off and to whom. Put sibling descriptions and command lists side by side. Overlaps only show up when you can see both.
+
+### 3. Audit
+
+Work through `references/audit-checklist.md`. For each finding record the evidence (quote the line), the severity (breaks triggering, confusing, or cosmetic) and the smallest fix. Report the most severe first.
+
+### 4. Settle boundaries
+
+When two skills claim the same request, give it one owner. Use the split the user's own design already uses (for example verdict versus artifact: one skill judges, the other writes). Ask the user only when their design doesn't settle it, and ask once.
+
+### 5. Edit
+
+Make the smallest change that fixes each finding. When the user will drop the result straight into a repo, hand back whole replacement files and copy untouched text exactly. When a fix needs a new shared piece (a handoff format, say), add a new reference file instead of editing one you haven't seen. List any reference files that probably need a matching update.
+
+### 6. Validate
+
+Run the check script on each skill folder:
+
+```
+python scripts/check_skill.py <path-to-skill-folder>
+```
+
+It checks that the name matches the folder, the description fits the 1024-character limit and has trigger and boundary wording, the H1 matches the name, referenced files exist, and the body stays a reasonable length. Fix every FAIL. Judge each WARN. If you only have pasted text, save the SKILL.md into a folder named after the skill and run it there; missing-reference warnings are expected in that case.
+
+### 7. Write test cases
+
+Follow `references/test-cases.md`. Every boundary you changed gets one case on each side. Run them by hand against the descriptions, or with skill-creator's loop when Claude Code is available, and say which you did.
+
+### 8. Report
+
+Keep it short:
+
+- What changed, per skill, and why (one line each).
+- Corrections to anything you said earlier.
+- What you could not see or did not run.
+- One next step.
+
+Lead with the changes, not with the process.
