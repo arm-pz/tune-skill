@@ -1,0 +1,9 @@
+{
+  "name": "tune-skill",
+  "version": "0.1.0",
+  "description": "Audits and fine-tunes an agent skill that already exists: triggering descriptions, sibling overlaps, stale names and counts, handoff contracts. Ships check_skill.py, a deterministic SKILL.md validator.",
+  "author": {
+    "name": "Abdul Rahman P Z"
+  },
+  "repository": "https://github.com/arm-pz/tune-skill"
+}
