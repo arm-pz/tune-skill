@@ -12,11 +12,43 @@ from pathlib import Path
 try:
     import yaml
 except ImportError:
-    sys.exit("PyYAML is required: pip install pyyaml --break-system-packages")
+    yaml = None
 
 MAX_DESC = 1024
 SOFT_DESC = 950
 MAX_BODY_LINES = 500
+
+# Wording that says the skill must run at a moment Claude does not choose. A description cannot
+# make that reliable; a mod can (see skill-to-mod).
+MOMENT_RE = re.compile(
+    r"\b(before|prior to)\b[^.\n]{0,50}\b(push(ing)?|deploy(ing)?|ship(ping)?|releas(e|ing)|"
+    r"publish(ing)?|merg(e|ing)|going live)\b", re.I)
+
+
+def parse_simple(block):
+    """Frontmatter without PyYAML: `key: value`, quoted values and > or | block scalars."""
+    # ponytail: covers the flat frontmatter skills use; install PyYAML for nested keys or lists.
+    meta, key, folded, lines = {}, None, False, []
+
+    def flush():
+        if key is not None and lines:
+            meta[key] = (" " if folded else "\n").join(lines)
+
+    for raw in block.split("\n"):
+        m = re.match(r"^([A-Za-z0-9_-]+):\s*(.*)$", raw)
+        if m:
+            flush()
+            key, value, lines = m.group(1), m.group(2).strip(), []
+            folded = value.startswith(">")
+            if value[:1] in (">", "|"):
+                continue
+            if len(value) > 1 and value[0] == value[-1] and value[0] in "'\"":
+                value = value[1:-1]
+            meta[key], key = value, None
+        elif key is not None and raw.strip():
+            lines.append(raw.strip())
+    flush()
+    return meta
 
 
 def main() -> int:
@@ -32,17 +64,22 @@ def main() -> int:
         print(f"FAIL  no SKILL.md in {folder}")
         return 1
 
-    text = skill_file.read_text(encoding="utf-8")
+    # utf-8-sig and the newline fix: files saved on Windows carry a BOM or CRLF line endings.
+    text = skill_file.read_text(encoding="utf-8-sig").replace("\r\n", "\n")
     match = re.match(r"^---\n(.*?)\n---\n(.*)$", text, re.S)
     if not match:
         print("FAIL  SKILL.md has no YAML frontmatter between --- lines")
         return 1
 
-    try:
-        meta = yaml.safe_load(match.group(1)) or {}
-    except yaml.YAMLError as exc:
-        print(f"FAIL  frontmatter is not valid YAML: {exc}")
-        return 1
+    if yaml is None:
+        meta = parse_simple(match.group(1))
+        warns.append("PyYAML not installed; frontmatter read with the simple parser")
+    else:
+        try:
+            meta = yaml.safe_load(match.group(1)) or {}
+        except yaml.YAMLError as exc:
+            print(f"FAIL  frontmatter is not valid YAML: {exc}")
+            return 1
     body = match.group(2)
 
     # name
@@ -92,15 +129,22 @@ def main() -> int:
             warns.append(f"body points to {ref}, which is not in this folder")
 
     # count claims like "six workflows" next to a numbered table
-    words = {"two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "seven": 7,
-             "eight": 8, "nine": 9, "ten": 10}
     for m in re.finditer(r"\b(two|three|four|five|six|seven|eight|nine|ten)\s+(workflows|modes|commands|steps)\b", body, re.I):
         warns.append(f"body says '{m.group(0)}'; check it matches the list that follows")
+
+    # a skill that must run at a moment: description tuning cannot make that reliable
+    moments = MOMENT_RE.findall(body)
+    note = None
+    if len(moments) >= 2:
+        note = (f"body ties the skill to {len(moments)} moments like 'before pushing or deploying'; "
+                "if a skipped run is costly, skill-to-mod can add a trigger")
 
     for msg in fails:
         print(f"FAIL  {msg}")
     for msg in warns:
         print(f"WARN  {msg}")
+    if note:
+        print(f"NOTE  {note}")
     if not fails and not warns:
         print("OK    no findings")
     print(f"\n{len(fails)} fail, {len(warns)} warn ({len(desc)} description chars, {lines} body lines)")
