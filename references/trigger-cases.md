@@ -24,6 +24,7 @@ run; none exists here.
 | 9 | "Tune the titles on my site pages so they don't cannibalise each other." | keyword-guard / keyword-resolver | tune-skill does not load | PASS: shares the verb "tune", different object |
 | 10 | "Update my existing skill." on a machine with Qoder's built-in `skill-creator` | tune-skill alone | only one loads | FAIL: `skill-creator`'s description explicitly covers "or update an existing skill". "update", "improve" and "tweak" are the verbs users actually type, and the built-in claims them |
 | 11 | "My skill's description is off, fix it." (no polish requested) | tune-skill | does not drag in a discovery audit | FAIL: `tune-and-polish` claims "fix a skill that isn't triggering correctly or overlaps with siblings" nearly verbatim, and its own description says it chains tune-skill. An agent picking the chain does more work than asked |
+| 12 | "I changed three descriptions today. Did anything in my skills folder get worse?" | tune-skill | runs `regress.py` against the saved baseline and lists regressions before any fix | PASS ("asks whether anything in a set of skills got worse"); hand-run 2026-10-23 |
 
 ## Boundary pairs
 
