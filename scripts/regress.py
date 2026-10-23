@@ -109,10 +109,18 @@ def findings(state):
     return items
 
 
+def key(finding):
+    # "description is 980 characters" and "... 975 characters" are the same finding; a count
+    # moving inside a message must not read as one regression plus one improvement.
+    return re.sub(r"\d+", "#", finding)
+
+
 def compare(old, new):
-    worse = sorted(findings(new) - findings(old))
+    old_f, new_f = findings(old), findings(new)
+    old_keys, new_keys = {key(f) for f in old_f}, {key(f) for f in new_f}
+    worse = sorted(f for f in new_f if key(f) not in old_keys)
     worse += [f"{n}: skill is gone" for n in sorted(set(old["skills"]) - set(new["skills"]))]
-    better = sorted(findings(old) - findings(new))
+    better = sorted(f for f in old_f if key(f) not in new_keys)
     added = sorted(set(new["skills"]) - set(old["skills"]))
     return worse, better, added
 

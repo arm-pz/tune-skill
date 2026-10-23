@@ -57,6 +57,14 @@ with tempfile.TemporaryDirectory() as tmp:
     code, out = run(root, base, "--external", "ghost-skill")
     assert code == 0 and any("writer-skill: WARN H1" in r for r in out["improvements"]), out
 
+    # A count changing inside the same finding is neither a regression nor an improvement.
+    long = "Writes a thing. " + "Pads the description. " * 44 + 'Use when the user says "write my thing please". Not for checks (use checker).'
+    skill(root, "writer-skill", long)
+    run(root, base, "--external", "ghost-skill", "--write")
+    skill(root, "writer-skill", long.replace("Writes a thing.", "Writes a thing well."))
+    code, out = run(root, base, "--external", "ghost-skill")
+    assert code == 0 and out["regressions"] == [] and out["improvements"] == [], out
+
     # A skill that disappears is a regression.
     (root / "copycat" / "SKILL.md").unlink()
     code, out = run(root, base, "--external", "ghost-skill")
