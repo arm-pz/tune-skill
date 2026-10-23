@@ -18,11 +18,12 @@ npx skills add arm-pz/tune-skill --skill tune-skill
 Or copy the `tune-skill/` folder into `~/.qoder/skills/` (Qoder) or `~/.claude/skills/` (Claude Code),
 then start a new session.
 
-The validator is plain Python 3 and needs PyYAML:
+The validator is plain Python 3. PyYAML is optional: without it a built-in reader handles flat
+frontmatter and still fails values that strict YAML loaders would reject.
 
 ```bash
-pip install pyyaml
 python scripts/check_skill.py /path/to/any-skill-folder
+python -I scripts/test_check_skill.py    # the validator's own self-check
 ```
 
 You can use `check_skill.py` on its own, without the skill, as a structural linter for any `SKILL.md`.
