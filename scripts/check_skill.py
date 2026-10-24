@@ -25,6 +25,35 @@ MOMENT_RE = re.compile(
     r"publish(ing)?|merg(e|ing)|going live)\b", re.I)
 
 
+NUMBERS = {w: i for i, w in enumerate(
+    "zero one two three four five six seven eight nine ten".split())}
+
+
+def list_sizes(body):
+    """Entry counts of every Markdown table (data rows) and top-level list in the body."""
+    sizes, rows, items = set(), 0, 0
+    for line in body.split("\n") + [""]:
+        s = line.strip()
+        if s.startswith("|"):
+            if not re.fullmatch(r"\|[\s:|-]+\|?", s):
+                rows += 1
+            continue
+        if rows:
+            sizes.add(rows - 1)  # minus the header row
+            rows = 0
+        if re.match(r"(\d+[.)]|[-*])\s", line):
+            items += 1
+            continue
+        if items and (not s or line.startswith((" ", "\t"))):
+            continue  # a blank line or an indented continuation stays in the list
+        if items:
+            sizes.add(items)
+            items = 0
+    if items:
+        sizes.add(items)  # a list that runs to the end of the body
+    return sizes
+
+
 def parse_simple(block):
     """Frontmatter without PyYAML: `key: value`, quoted values and > or | block scalars."""
     # ponytail: covers the flat frontmatter skills use; install PyYAML for nested keys or lists.
@@ -135,9 +164,11 @@ def main() -> int:
         if not (folder / ref).exists():
             warns.append(f"body points to {ref}, which is not in this folder")
 
-    # count claims like "six workflows" next to a numbered table
+    # count claims like "six workflows": some table or list in the body should have that many entries
     for m in re.finditer(r"\b(two|three|four|five|six|seven|eight|nine|ten)\s+(workflows|modes|commands|steps)\b", body, re.I):
-        warns.append(f"body says '{m.group(0)}'; check it matches the list that follows")
+        claimed = NUMBERS[m.group(1).lower()]
+        if claimed not in list_sizes(body):
+            warns.append(f"body says '{m.group(0)}' but no table or list in it has {claimed} entries")
 
     # a skill that must run at a moment: description tuning cannot make that reliable
     moments = MOMENT_RE.findall(body)

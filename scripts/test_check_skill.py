@@ -54,6 +54,17 @@ for no_yaml in (False, True):
     code, out = run(BAD, no_yaml=no_yaml)
     assert code == 1 and "not valid YAML" in out, (no_yaml, out)
 
+# A count claim is checked against the tables and lists in the body, wherever they sit.
+TABLE = "\n## Modes\n\n| Mode | Use |\n| --- | --- |\n| a | x |\n| b | y |\n| c | z |\n"
+code, out = run(SKILL + "\nIt has three modes.\n" + TABLE)
+assert "three modes" not in out, out
+code, out = run(SKILL + "\nIt has four modes.\n" + TABLE)
+assert "says 'four modes' but no table or list in it has 4 entries" in out, out
+code, out = run(SKILL + "\nThree steps:\n\n1. one\n2. two\n   detail\n\n3. three\n")
+assert "Three steps" not in out, out
+code, out = run(SKILL + "\nTwo steps:\n\n1. one\n2. two\n3. three\n")
+assert "says 'Two steps' but no table or list in it has 2 entries" in out, out
+
 code, out = run("# no frontmatter\n")
 assert code == 1 and "no YAML frontmatter" in out, out
 
