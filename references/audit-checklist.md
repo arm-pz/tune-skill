@@ -54,3 +54,11 @@ Fix: pick one owner, narrow the other side to diagnosis plus a handoff offer, an
 - Never-invent, honesty and fairness rules, and privacy rules stay at least as strong.
 - Credits and licence notes stay.
 - Safety notes about third-party code stay.
+
+## H. Moments a description cannot guarantee
+
+A description decides whether Claude reaches for a skill when it judges it relevant. It cannot make a skill run at a moment Claude does not choose.
+
+- If the skill says it must run before pushing, deploying, publishing or releasing, ask whether a skipped run is costly. If it is, no wording fix makes it reliable: hand off to skill-to-mod, which adds a thin trigger and keeps the skill unchanged.
+- If a skipped run is cheap, leave it a skill and tune the description as usual.
+- Never edit trigger wording to fake reliability ("ALWAYS run this before every push"). It overtriggers on everything else.

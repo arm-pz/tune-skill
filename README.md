@@ -18,14 +18,24 @@ npx skills add arm-pz/tune-skill --skill tune-skill
 Or copy the `tune-skill/` folder into `~/.qoder/skills/` (Qoder) or `~/.claude/skills/` (Claude Code),
 then start a new session.
 
-The validator is plain Python 3 and needs PyYAML:
+The validator is plain Python 3. PyYAML is optional: without it a built-in reader handles flat
+frontmatter and still fails values that strict YAML loaders would reject.
 
 ```bash
-pip install pyyaml
 python scripts/check_skill.py /path/to/any-skill-folder
+python -I scripts/test_check_skill.py    # the validator's own self-check
 ```
 
 You can use `check_skill.py` on its own, without the skill, as a structural linter for any `SKILL.md`.
+
+To keep a whole family healthy over time, `regress.py` re-checks every skill against a saved
+baseline and exits 1 on anything new: a FAIL or WARN, a "(use X)" handoff to a skill that does not
+exist, or two skills quoting the same trigger phrase. Run it in CI on a schedule:
+
+```bash
+python scripts/regress.py ~/skills --baseline health.json           # compare
+python scripts/regress.py ~/skills --baseline health.json --write   # accept, after review
+```
 
 ## Ask it things like
 
