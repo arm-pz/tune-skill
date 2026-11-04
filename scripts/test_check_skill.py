@@ -25,12 +25,15 @@ NO_YAML = ("import runpy, sys; sys.modules['yaml'] = None; sys.argv = sys.argv[1
            "runpy.run_path(sys.argv[0], run_name='__main__')")
 
 
-def run(text, newline="\n", bom=False, no_yaml=False):
+def run(text, newline="\n", bom=False, no_yaml=False, extra=()):
     with tempfile.TemporaryDirectory() as tmp:
         folder = Path(tmp) / "demo-skill"
         folder.mkdir()
         data = text.replace("\n", newline).encode("utf-8")
         (folder / "SKILL.md").write_bytes((b"\xef\xbb\xbf" if bom else b"") + data)
+        for rel in extra:
+            (folder / rel).parent.mkdir(parents=True, exist_ok=True)
+            (folder / rel).write_text("x", encoding="utf-8")
         cmd = [sys.executable, "-I"] + (["-c", NO_YAML] if no_yaml else []) + [str(CHECK), str(folder)]
         p = subprocess.run(cmd,
                            capture_output=True, text=True, encoding="utf-8")
@@ -64,6 +67,12 @@ code, out = run(SKILL + "\nThree steps:\n\n1. one\n2. two\n   detail\n\n3. three
 assert "Three steps" not in out, out
 code, out = run(SKILL + "\nTwo steps:\n\n1. one\n2. two\n3. three\n")
 assert "says 'Two steps' but no table or list in it has 2 entries" in out, out
+
+# Working files another skill left at the root install with this one.
+code, out = run(SKILL, extra=("discovery-kit.md", "discovery/site-page.md"))
+assert "discovery-kit.md is in the skill folder" in out and "discovery is in the skill folder" in out, out
+code, out = run(SKILL, extra=(".github/discovery/discovery-kit.md",))
+assert "skill folder, so it installs" not in out, out
 
 code, out = run("# no frontmatter\n")
 assert code == 1 and "no YAML frontmatter" in out, out
