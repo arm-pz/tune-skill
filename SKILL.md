@@ -1,6 +1,7 @@
 ---
 name: tune-skill
 description: Audit and fine-tune an existing agent skill so it triggers when it should and hands off cleanly to its siblings. Reads the real SKILL.md and references, checks the description, sibling overlaps, stale names and counts, handoffs and command routing, makes minimal evidenced edits, validates them with a script, writes near-miss test cases, and re-checks the whole family against a saved baseline. Use whenever the user wants to fine tune, improve, tighten, debug or review a skill, says a skill is not triggering or fires on the wrong requests, wants two skills to work together or split cleanly, asks whether anything in a set of skills got worse, or pastes a SKILL.md or repo link and asks what is wrong with it, even if they never say "audit". Not for creating a skill from scratch (use draft-skill) or from a list of prompts (use prompts-to-skill), or for making a skill run automatically at a moment such as before git push (use skill-to-mod).
+version: 1.0.0
 ---
 
 # Tune skill
