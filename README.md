@@ -6,7 +6,7 @@ request, catches stale names and counts, fixes handoff contracts and command rou
 evidenced edits, and validates them with a script rather than by eye.
 
 It is explicitly not a rewrite. Every finding has to carry the quoted line, a severity, and the smallest
-fix — and the skill is required to say which checks ran, which test cases were only written, and which
+fix, and the skill is required to say which checks ran, which test cases were only written, and which
 files it never got to see.
 
 ## Install
@@ -39,7 +39,7 @@ python scripts/regress.py ~/skills --baseline health.json --write   # accept, af
 
 ## Ask it things like
 
-- "This skill fires on the wrong requests — what's wrong with its description?"
+- "This skill fires on the wrong requests. What's wrong with its description?"
 - "I have two skills that both claim SEO audits. Split them cleanly."
 - "Review this SKILL.md I just pasted and fix it minimally."
 - "Make sure this skill hands off to its sibling instead of duplicating it."
@@ -65,6 +65,8 @@ reproducible.
 tune-skill/
 ├── SKILL.md
 ├── LICENSE
+├── evals/
+│   └── trigger-cases.md     # hand-run trigger cases
 ├── references/
 │   ├── audit-checklist.md   # the eight audit sections, with severity rules
 │   └── test-cases.md        # the >=8-case format: clear, implicit, near-miss, boundary pairs

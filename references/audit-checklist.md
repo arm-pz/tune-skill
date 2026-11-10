@@ -35,8 +35,8 @@ Fix: pick one owner, narrow the other side to diagnosis plus a handoff offer, an
 - The H1 matches the skill name. A leftover name from an earlier version is common.
 - Counts match lists ("six workflows" and the table below it).
 - The invocation examples, the routing list and the alias list agree about which commands exist.
-- Every file the body points to exists and says when to read it.
-- Version fields aren't duplicated with different values.
+- Every file the body points to exists and says when to read it. Test material (trigger cases, evals) lives in `evals/`, not `references/`, so the body does not have to route to it.
+- Version fields aren't duplicated with different values. Compare the frontmatter `version` with `.claude-plugin/plugin.json` and `marketplace.json` where the repo has them.
 
 ## E. Source-of-truth precedence
 
