@@ -164,6 +164,13 @@ def main() -> int:
         if not (folder / ref).exists():
             warns.append(f"body points to {ref}, which is not in this folder")
 
+    # working files other skills write at a skill root (findable's discovery kit, copier answers)
+    # ship to every user who installs it; they belong outside the skill folder (e.g. .github/)
+    for stray in ("discovery-kit.md", "discovery", ".copier-answers.yml"):
+        if (folder / stray).exists():
+            warns.append(f"{stray} is in the skill folder, so it installs with the skill; "
+                         "move it outside (e.g. .github/) or delete it")
+
     # count claims like "six workflows": some table or list in the body should have that many entries
     for m in re.finditer(r"\b(two|three|four|five|six|seven|eight|nine|ten)\s+(workflows|modes|commands|steps)\b", body, re.I):
         claimed = NUMBERS[m.group(1).lower()]
