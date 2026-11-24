@@ -14,7 +14,7 @@ Fine-tuning is a set of small, evidenced edits to a skill that already exists. I
 - **Check your own claims.** If a file you read later contradicts something you said earlier, say so plainly and correct it. Don't quietly route around it.
 - **Minimal edits, the author's voice.** Change what the audit found and nothing else. Keep frontmatter keys you don't recognise (`version`, `argument-hint`, `user-invocable`). Never weaken honesty, safety or privacy rules.
 - **Don't claim what you didn't run.** Say which checks ran, which test cases were only written, and which files you never saw.
-- **Never look at a holdout set.** If the skill has an eval holdout (eval-harness keeps it outside the project, for example `~/.eval-holdout/`), do not open, search or quote it, and do not tune toward its cases. Use only the aggregate score someone gives you. Tuning on it hides overfitting.
+- **Never look at a holdout set.** If the skill has an eval holdout (skill-eval-suite keeps it outside the project, for example `~/.eval-holdout/`), do not open, search or quote it, and do not tune toward its cases. Use only the aggregate score someone gives you. Tuning on it hides overfitting.
 
 ## Workflow
 
