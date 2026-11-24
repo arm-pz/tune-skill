@@ -68,4 +68,58 @@ assert "says 'Two steps' but no table or list in it has 2 entries" in out, out
 code, out = run("# no frontmatter\n")
 assert code == 1 and "no YAML frontmatter" in out, out
 
+# --lint: off by default, so default output (and regress.py baselines) never change.
+code, out = run(SKILL)
+assert "LINT" not in out, out
+
+
+def run_lint(text):
+    with tempfile.TemporaryDirectory() as tmp:
+        folder = Path(tmp) / "demo-skill"
+        folder.mkdir()
+        (folder / "SKILL.md").write_text(text, encoding="utf-8")
+        p = subprocess.run([sys.executable, "-I", str(CHECK), str(folder), "--lint"],
+                           capture_output=True, text=True, encoding="utf-8")
+        return p.returncode, p.stdout
+
+
+GOOD = SKILL + """
+## Workflow
+
+### 1. Inventory
+
+    python scripts/inventory.py . > inv.json
+
+Check that `inv.json` lists at least one file; if it is empty, stop.
+
+### 2. Score
+
+Run `python scripts/score.py inv.json`. It exits 0 on pass; confirm the exit code before step 3.
+
+### 3. Report
+
+Run `git diff --stat` and check the output names only the files you changed.
+
+## When it fails
+
+| Failure | Fix |
+| --- | --- |
+| inventory is empty | pass the project root, not a subfolder |
+| score exits 2 | write judgments.json, then score again |
+"""
+code, out = run_lint(GOOD)
+assert code == 0 and out.count("LINT  PASS") == 3 and "lint: 3 pass, 0 fail" in out, out
+
+code, out = run_lint(SKILL)
+assert code == 1 and "no numbered steps" in out and "no error recovery section" in out, out
+
+code, out = run_lint(GOOD.replace("### 2. Score", "### 2. Score and report"))
+assert "more than one objective in step 2" in out, out
+code, out = run_lint(GOOD.replace("### 1. Inventory\n\n    python scripts/inventory.py . > inv.json\n",
+                                  "### 1. Inventory\n\nLook around the project.\n"))
+assert "no concrete command in step 1" in out, out
+code, out = run_lint(GOOD.replace("| score exits 2 | write judgments.json, then score again |",
+                                  "| score exits 2 | Try again |"))
+assert "'try again' is not a fix for: score exits 2" in out, out
+
 print("ok")

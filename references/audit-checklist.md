@@ -62,3 +62,14 @@ A description decides whether Claude reaches for a skill when it judges it relev
 - If the skill says it must run before pushing, deploying, publishing or releasing, ask whether a skipped run is costly. If it is, no wording fix makes it reliable: hand off to skill-to-mod, which adds a thin trigger and keeps the skill unchanged.
 - If a skipped run is cheap, leave it a skill and tune the description as usual.
 - Never edit trigger wording to fake reliability ("ALWAYS run this before every push"). It overtriggers on everything else.
+
+## I. How the workflow is written (`check_skill.py --lint`)
+
+Pass-or-fail rules distilled from skills that held up at scale (Uber's skill linter, 2026). Run them with `--lint`; they are opt-in so a family baseline does not move until you choose to adopt them.
+
+- **numbered-steps.** Steps are numbered, each has one objective, and each has some way to at least soft verify it. A step titled "Score and report" is two steps.
+- **command-checked.** Each step gives a concrete command and checks its result before the next step. A judgement step can still name the file it reads or the script that shows the evidence.
+- **error-recovery.** The skill has a section with a table of failures and their fixes. "Try again", "retry" or "re-run" is not a fix.
+
+Report each failed rule with the steps it named, severity "confusing". Fix it only where the step really is ambiguous; a skill that is mostly judgement may fail command-checked on purpose, so say so instead of inventing commands.
+

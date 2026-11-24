@@ -14,6 +14,7 @@ Fine-tuning is a set of small, evidenced edits to a skill that already exists. I
 - **Check your own claims.** If a file you read later contradicts something you said earlier, say so plainly and correct it. Don't quietly route around it.
 - **Minimal edits, the author's voice.** Change what the audit found and nothing else. Keep frontmatter keys you don't recognise (`version`, `argument-hint`, `user-invocable`). Never weaken honesty, safety or privacy rules.
 - **Don't claim what you didn't run.** Say which checks ran, which test cases were only written, and which files you never saw.
+- **Never look at a holdout set.** If the skill has an eval holdout (skill-eval-suite keeps it outside the project, for example `~/.eval-holdout/`), do not open, search or quote it, and do not tune toward its cases. Use only the aggregate score someone gives you. Tuning on it hides overfitting.
 
 ## Workflow
 
@@ -45,7 +46,7 @@ Run the check script on each skill folder:
 python scripts/check_skill.py <path-to-skill-folder>
 ```
 
-It checks that the name matches the folder, the description fits the 1024-character limit and has trigger and boundary wording, the H1 matches the name, referenced files exist, and the body stays a reasonable length. Fix every FAIL. Judge each WARN. A NOTE means the body ties the skill to a moment Claude does not choose (before pushing, deploying, releasing); see section H of the checklist. The script reads CRLF and BOM files and works without PyYAML; `python -I scripts/test_check_skill.py` is its self-check. If you only have pasted text, save the SKILL.md into a folder named after the skill and run it there; missing-reference warnings are expected in that case.
+It checks that the name matches the folder, the description fits the 1024-character limit and has trigger and boundary wording, the H1 matches the name, referenced files exist, and the body stays a reasonable length. Fix every FAIL. Judge each WARN. A NOTE means the body ties the skill to a moment Claude does not choose (before pushing, deploying, releasing); see section H of the checklist. The script reads CRLF and BOM files and works without PyYAML; `python -I scripts/test_check_skill.py` is its self-check. Add `--lint` to also check how the workflow is written: numbered steps with one objective each and a way to verify them, a concrete command per step whose result is checked, and an error recovery table of failures and fixes ("try again" is not a fix). Lint results print as `LINT` lines that `regress.py` ignores; report them as findings under section I of the checklist, and do not rewrite a skill's whole workflow to pass them unless the user asks. If you only have pasted text, save the SKILL.md into a folder named after the skill and run it there; missing-reference warnings are expected in that case.
 
 ### 7. Write test cases
 

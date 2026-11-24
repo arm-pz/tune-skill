@@ -23,6 +23,7 @@ frontmatter and still fails values that strict YAML loaders would reject.
 
 ```bash
 python scripts/check_skill.py /path/to/any-skill-folder
+python scripts/check_skill.py /path/to/any-skill-folder --lint   # + numbered steps, commands, error recovery
 python -I scripts/test_check_skill.py    # the validator's own self-check
 ```
 
